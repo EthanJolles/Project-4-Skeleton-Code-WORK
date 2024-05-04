@@ -75,8 +75,7 @@ variable:
 	IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} ;
 
 list:
-	'(' expressions ')' {if (!checkUniformType(*$2)) {yyerror("List Element Types Do Not Match");}
-        $$ = $2;} ;
+	'(' expressions ')' {$$ = $2;} ;
 
 expressions:
 	expressions ',' expression | 
@@ -121,7 +120,7 @@ term:
 
 primary:
 	'(' expression ')' {$$ = $2;} |
-	HEX_INT_LITERAL |
+	HEX_INT_LITERAL
 	INT_LITERAL | 
 	REAL_LITERAL |
 	CHAR_LITERAL |

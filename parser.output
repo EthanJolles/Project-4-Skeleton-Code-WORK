@@ -60,27 +60,26 @@ Grammar
    31     | primary
 
    32 primary: '(' expression ')'
-   33        | HEX_INT_LITERAL
-   34        | INT_LITERAL
-   35        | REAL_LITERAL
-   36        | CHAR_LITERAL
-   37        | IDENTIFIER '(' expression ')'
-   38        | IDENTIFIER
+   33        | HEX_INT_LITERAL INT_LITERAL
+   34        | REAL_LITERAL
+   35        | CHAR_LITERAL
+   36        | IDENTIFIER '(' expression ')'
+   37        | IDENTIFIER
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '(' (40) 12 26 32 37
-    ')' (41) 12 26 32 37
+    '(' (40) 12 26 32 36
+    ')' (41) 12 26 32 36
     ',' (44) 13 19
     ':' (58) 10 11 19
     ';' (59) 4 10 11 15 16 17 20 23
     error (256) 17
-    IDENTIFIER <iden> (258) 4 7 10 11 37 38
-    INT_LITERAL <value> (259) 23 34
-    CHAR_LITERAL <value> (260) 36
-    REAL_LITERAL <value> (261) 35
+    IDENTIFIER <iden> (258) 4 7 10 11 36 37
+    INT_LITERAL <value> (259) 23 33
+    CHAR_LITERAL <value> (260) 35
+    REAL_LITERAL <value> (261) 34
     HEX_INT_LITERAL <value> (262) 33
     ADDOP (263) 28
     MULOP (264) 30
@@ -155,12 +154,12 @@ Nonterminals, with rules where they appear
         on right: 24 25
     expression <type> (49)
         on left: 28 29
-        on right: 13 14 18 19 20 27 28 32 37
+        on right: 13 14 18 19 20 27 28 32 36
     term <type> (50)
         on left: 30 31
         on right: 28 29 30
     primary <type> (51)
-        on left: 32 33 34 35 36 37 38
+        on left: 32 33 34 35 36 37
         on right: 30 31
 
 
@@ -343,19 +342,18 @@ State 20
 
     error            shift, and go to state 25
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    SWITCH           shift, and go to state 31
-    WHEN             shift, and go to state 32
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    SWITCH           shift, and go to state 30
+    WHEN             shift, and go to state 31
+    '('              shift, and go to state 32
 
-    statement_  go to state 34
-    statement   go to state 35
-    expression  go to state 36
-    term        go to state 37
-    primary     go to state 38
+    statement_  go to state 33
+    statement   go to state 34
+    expression  go to state 35
+    term        go to state 36
+    primary     go to state 37
 
 
 State 21
@@ -380,7 +378,7 @@ State 23
     CHARACTER   shift, and go to state 15
     INTEGER     shift, and go to state 16
 
-    type  go to state 39
+    type  go to state 38
 
 
 State 24
@@ -388,130 +386,119 @@ State 24
    10 variable: IDENTIFIER ':' type IS • statement ';'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    SWITCH           shift, and go to state 31
-    WHEN             shift, and go to state 32
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    SWITCH           shift, and go to state 30
+    WHEN             shift, and go to state 31
+    '('              shift, and go to state 32
 
-    statement   go to state 40
-    expression  go to state 36
-    term        go to state 37
-    primary     go to state 38
+    statement   go to state 39
+    expression  go to state 35
+    term        go to state 36
+    primary     go to state 37
 
 
 State 25
 
    17 statement_: error • ';'
 
-    ';'  shift, and go to state 41
+    ';'  shift, and go to state 40
 
 
 State 26
 
-   37 primary: IDENTIFIER • '(' expression ')'
-   38        | IDENTIFIER •
+   36 primary: IDENTIFIER • '(' expression ')'
+   37        | IDENTIFIER •
 
-    '('  shift, and go to state 42
+    '('  shift, and go to state 41
 
-    $default  reduce using rule 38 (primary)
+    $default  reduce using rule 37 (primary)
 
 
 State 27
 
-   34 primary: INT_LITERAL •
-
-    $default  reduce using rule 34 (primary)
-
-
-State 28
-
-   36 primary: CHAR_LITERAL •
-
-    $default  reduce using rule 36 (primary)
-
-
-State 29
-
-   35 primary: REAL_LITERAL •
+   35 primary: CHAR_LITERAL •
 
     $default  reduce using rule 35 (primary)
 
 
+State 28
+
+   34 primary: REAL_LITERAL •
+
+    $default  reduce using rule 34 (primary)
+
+
+State 29
+
+   33 primary: HEX_INT_LITERAL • INT_LITERAL
+
+    INT_LITERAL  shift, and go to state 42
+
+
 State 30
-
-   33 primary: HEX_INT_LITERAL •
-
-    $default  reduce using rule 33 (primary)
-
-
-State 31
 
    20 statement: SWITCH • expression IS cases OTHERS ARROW statement ';' ENDSWITCH
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 43
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
-State 32
+State 31
 
    19 statement: WHEN • condition ',' expression ':' expression
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
     '('              shift, and go to state 44
 
     condition   go to state 45
     relation    go to state 46
     expression  go to state 47
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
-State 33
+State 32
 
    32 primary: '(' • expression ')'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 48
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
-State 34
+State 33
 
    15 body: BEGIN_ statement_ • END ';'
 
     END  shift, and go to state 49
 
 
-State 35
+State 34
 
    16 statement_: statement • ';'
 
     ';'  shift, and go to state 50
 
 
-State 36
+State 35
 
    18 statement: expression •
    28 expression: expression • ADDOP term
@@ -521,7 +508,7 @@ State 36
     $default  reduce using rule 18 (statement)
 
 
-State 37
+State 36
 
    29 expression: term •
    30 term: term • MULOP primary
@@ -531,48 +518,54 @@ State 37
     $default  reduce using rule 29 (expression)
 
 
-State 38
+State 37
 
    31 term: primary •
 
     $default  reduce using rule 31 (term)
 
 
-State 39
+State 38
 
    11 variable: IDENTIFIER ':' LIST OF type • IS list ';'
 
     IS  shift, and go to state 53
 
 
-State 40
+State 39
 
    10 variable: IDENTIFIER ':' type IS statement • ';'
 
     ';'  shift, and go to state 54
 
 
-State 41
+State 40
 
    17 statement_: error ';' •
 
     $default  reduce using rule 17 (statement_)
 
 
-State 42
+State 41
 
-   37 primary: IDENTIFIER '(' • expression ')'
+   36 primary: IDENTIFIER '(' • expression ')'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 55
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
+
+
+State 42
+
+   33 primary: HEX_INT_LITERAL INT_LITERAL •
+
+    $default  reduce using rule 33 (primary)
 
 
 State 43
@@ -590,17 +583,16 @@ State 44
    32 primary: '(' • expression ')'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
     '('              shift, and go to state 44
 
     condition   go to state 57
     relation    go to state 46
     expression  go to state 58
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 45
@@ -656,14 +648,13 @@ State 51
    28 expression: expression ADDOP • term
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     term     go to state 64
-    primary  go to state 38
+    primary  go to state 37
 
 
 State 52
@@ -671,11 +662,10 @@ State 52
    30 term: term MULOP • primary
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     primary  go to state 65
 
@@ -699,7 +689,7 @@ State 54
 State 55
 
    28 expression: expression • ADDOP term
-   37 primary: IDENTIFIER '(' expression • ')'
+   36 primary: IDENTIFIER '(' expression • ')'
 
     ADDOP  shift, and go to state 51
     ')'    shift, and go to state 68
@@ -739,16 +729,15 @@ State 59
    24 condition: condition ANDOP • relation
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
     '('              shift, and go to state 44
 
     relation    go to state 71
     expression  go to state 47
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 60
@@ -756,15 +745,14 @@ State 60
    19 statement: WHEN condition ',' • expression ':' expression
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 72
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 61
@@ -772,15 +760,14 @@ State 61
    27 relation: expression RELOP • expression
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 73
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 62
@@ -819,16 +806,15 @@ State 66
    12 list: '(' • expressions ')'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expressions  go to state 74
     expression   go to state 75
-    term         go to state 37
-    primary      go to state 38
+    term         go to state 36
+    primary      go to state 37
 
 
 State 67
@@ -840,9 +826,9 @@ State 67
 
 State 68
 
-   37 primary: IDENTIFIER '(' expression ')' •
+   36 primary: IDENTIFIER '(' expression ')' •
 
-    $default  reduce using rule 37 (primary)
+    $default  reduce using rule 36 (primary)
 
 
 State 69
@@ -941,15 +927,14 @@ State 80
    19 statement: WHEN condition ',' expression ':' • expression
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 85
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 81
@@ -964,15 +949,14 @@ State 82
    13 expressions: expressions ',' • expression
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    '('              shift, and go to state 32
 
     expression  go to state 86
-    term        go to state 37
-    primary     go to state 38
+    term        go to state 36
+    primary     go to state 37
 
 
 State 83
@@ -987,18 +971,17 @@ State 84
    20 statement: SWITCH expression IS cases OTHERS ARROW • statement ';' ENDSWITCH
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    SWITCH           shift, and go to state 31
-    WHEN             shift, and go to state 32
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    SWITCH           shift, and go to state 30
+    WHEN             shift, and go to state 31
+    '('              shift, and go to state 32
 
     statement   go to state 88
-    expression  go to state 36
-    term        go to state 37
-    primary     go to state 38
+    expression  go to state 35
+    term        go to state 36
+    primary     go to state 37
 
 
 State 85
@@ -1026,18 +1009,17 @@ State 87
    23 case: CASE INT_LITERAL ARROW • statement ';'
 
     IDENTIFIER       shift, and go to state 26
-    INT_LITERAL      shift, and go to state 27
-    CHAR_LITERAL     shift, and go to state 28
-    REAL_LITERAL     shift, and go to state 29
-    HEX_INT_LITERAL  shift, and go to state 30
-    SWITCH           shift, and go to state 31
-    WHEN             shift, and go to state 32
-    '('              shift, and go to state 33
+    CHAR_LITERAL     shift, and go to state 27
+    REAL_LITERAL     shift, and go to state 28
+    HEX_INT_LITERAL  shift, and go to state 29
+    SWITCH           shift, and go to state 30
+    WHEN             shift, and go to state 31
+    '('              shift, and go to state 32
 
     statement   go to state 89
-    expression  go to state 36
-    term        go to state 37
-    primary     go to state 38
+    expression  go to state 35
+    term        go to state 36
+    primary     go to state 37
 
 
 State 88

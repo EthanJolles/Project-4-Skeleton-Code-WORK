@@ -14,6 +14,7 @@
 #include <map>
 #include <vector>
 
+
 using namespace std;
 
 #include "types.h"
@@ -77,15 +78,4 @@ int hexToInt(const std::string& hexString) {
     int decimal;
     ss >> decimal;
     return decimal;
-}
-
-bool checkUniformType(const vector<double>& elements) {
-    if (elements.empty()) return true;  // Empty lists are uniform by definition
-    auto firstType = elements[0];
-    for (auto& elem : elements) {
-        if (elem != firstType) {
-            return false;
-        }
-    }
-    return true;
 }
