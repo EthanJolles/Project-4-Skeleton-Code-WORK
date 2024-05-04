@@ -20,6 +20,8 @@ using namespace std;
 #include "types.h"
 #include "listing.h"
 
+Types currentListType;
+
 void checkAssignment(Types lValue, Types rValue, string message) {
 	if (lValue != MISMATCH && rValue != MISMATCH && lValue != rValue)
 		appendError(GENERAL_SEMANTIC, "Type Mismatch on " + message);
@@ -78,4 +80,20 @@ int hexToInt(const std::string& hexString) {
     int decimal;
     ss >> decimal;
     return decimal;
+}
+
+bool checkListTypes(const vector<Types>* typesList, Types expectedType) {
+    for (const auto& type : *typesList) {
+        if (type != expectedType) {
+            return false;
+        }
+    }
+    return true;
+}
+
+Types getTypeOfExpression(double value) {
+    if (floor(value) == value) {
+        return INT_TYPE;
+    }
+    return REAL_TYPE;
 }

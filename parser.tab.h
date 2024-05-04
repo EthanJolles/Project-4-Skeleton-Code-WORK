@@ -95,8 +95,9 @@ union YYSTYPE
 	double value;
 	vector<double>* values;
 	vector<double>* list;
+	vector<Types>* typesList;
 
-#line 100 "parser.tab.h"
+#line 101 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

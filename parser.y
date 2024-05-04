@@ -34,6 +34,7 @@ Symbols<Types> lists;
 	double value;
 	vector<double>* values;
 	vector<double>* list;
+	vector<Types>* typesList;
 }
 
 %token <iden> IDENTIFIER
@@ -45,8 +46,10 @@ Symbols<Types> lists;
 %token BEGIN_ CASE CHARACTER ELSE END ENDSWITCH FUNCTION INTEGER IS LIST OF OTHERS
 	RETURNS SWITCH WHEN
 
-%type <type> list expressions body type statement_ statement cases case expression
+%type <type> body type statement_ statement cases case expression
 	term primary
+
+%type <typesList> list expressions
 
 %%
 
@@ -72,14 +75,28 @@ optional_variable:
     
 variable:	
 	IDENTIFIER ':' type IS statement ';' {checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3);} |
-	IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} ;
+    IDENTIFIER ':' LIST OF type IS list ';' {
+        lists.insert($1, $5);
+        currentListType = $5;
+    } 
 
 list:
-	'(' expressions ')' {$$ = $2;} ;
+    '(' expressions ')' {
+        $$ = $2;
+        if (!checkListTypes($$, currentListType)) {
+            yyerror("List initialization type mismatch");
+        }
+    } ;
 
 expressions:
-	expressions ',' expression | 
-	expression ;
+    expressions ',' expression {
+        $$ = $1;
+        $$->push_back(getTypeOfExpression($3));
+    }
+    | expression {
+        $$ = new vector<Types>;
+        $$->push_back(getTypeOfExpression($1));
+    };
 
 body:
 	BEGIN_ statement_ END ';' {$$ = $2;} ;
