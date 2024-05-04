@@ -39,11 +39,33 @@ real [0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?
 {comment2}	{ ECHO; nextLine();}
 {line}		{ ECHO; nextLine(); }
 
-"+"		{ ECHO; return(ADDOP); }
-"*"		{ ECHO; return(MULOP); }
-"&"		{ ECHO; return(ANDOP); }
-"<"		{ ECHO; return(RELOP); }
+
+"+"		{ ECHO; yylval.oper = ADD; return(ADDOP); }
+"-"      { ECHO; yylval.oper = SUB; return(ADDOP); }
+"*"		{ ECHO; yylval.oper = MULTIPLY; return(MULOP); }
+"&"		{ ECHO; yylval.oper = AND; return(ANDOP); }
 "=>"		{ ECHO; return(ARROW); }
+"/"      { ECHO; yylval.oper = DIVIDE; return(MULOP); }
+"%"      { ECHO; yylval.oper = MODULO; return(MODOP); }
+"~"      { ECHO; yylval.oper = NEGATE; return(NEGOP); }
+"^"      { ECHO; yylval.oper = XOR; return(XOROP); }
+"<"		{ ECHO; yylval.oper = LESS; return(RELOP); }
+"<="      { ECHO; yylval.oper = LESSTHANEQUAL; return(RELOP); }
+">"      { ECHO; yylval.oper = GREATER; return(RELOP); }
+">="      { ECHO; yylval.oper = GREATERTHANEQUAL; return(RELOP); }
+"<>"     {ECHO; yylval.oper = NOTEQUAL; return(RELOP);}
+"="      { ECHO; yylval.oper = EQUALS; return(RELOP); }
+"!"      { ECHO; yylval.oper = NOT; return(NOTOP); }
+"|"      { ECHO; yylval.oper = OR; return(OROP); }
+
+if		{ ECHO; return(IF); }
+else  { ECHO; return(ELSE); }
+elsif { ECHO; return(ELSIF); }
+endif { ECHO; return(ENDIF); }
+fold        { ECHO; return FOLD; }
+endfold { ECHO; return ENDFOLD; }
+left {ECHO; return LEFT; }
+right {ECHO; return RIGHT; }
 begin		{ ECHO; return(BEGIN_); }
 case		{ ECHO; return(CASE); }
 character	{ ECHO; return(CHARACTER); }

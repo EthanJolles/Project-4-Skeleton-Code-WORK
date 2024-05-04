@@ -59,26 +59,39 @@ extern int yydebug;
     CHAR_LITERAL = 260,            /* CHAR_LITERAL  */
     REAL_LITERAL = 261,            /* REAL_LITERAL  */
     HEX_INT_LITERAL = 262,         /* HEX_INT_LITERAL  */
-    ADDOP = 263,                   /* ADDOP  */
-    MULOP = 264,                   /* MULOP  */
+    OROP = 263,                    /* OROP  */
+    ANDOP = 264,                   /* ANDOP  */
     RELOP = 265,                   /* RELOP  */
-    ANDOP = 266,                   /* ANDOP  */
-    ARROW = 267,                   /* ARROW  */
-    BEGIN_ = 268,                  /* BEGIN_  */
-    CASE = 269,                    /* CASE  */
-    CHARACTER = 270,               /* CHARACTER  */
-    ELSE = 271,                    /* ELSE  */
-    END = 272,                     /* END  */
-    ENDSWITCH = 273,               /* ENDSWITCH  */
-    FUNCTION = 274,                /* FUNCTION  */
-    INTEGER = 275,                 /* INTEGER  */
-    IS = 276,                      /* IS  */
-    LIST = 277,                    /* LIST  */
-    OF = 278,                      /* OF  */
-    OTHERS = 279,                  /* OTHERS  */
-    RETURNS = 280,                 /* RETURNS  */
-    SWITCH = 281,                  /* SWITCH  */
-    WHEN = 282                     /* WHEN  */
+    ADDOP = 266,                   /* ADDOP  */
+    MULOP = 267,                   /* MULOP  */
+    MODOP = 268,                   /* MODOP  */
+    XOROP = 269,                   /* XOROP  */
+    NEGOP = 270,                   /* NEGOP  */
+    NOTOP = 271,                   /* NOTOP  */
+    ARROW = 272,                   /* ARROW  */
+    FOLD = 273,                    /* FOLD  */
+    ENDFOLD = 274,                 /* ENDFOLD  */
+    LEFT = 275,                    /* LEFT  */
+    RIGHT = 276,                   /* RIGHT  */
+    BEGIN_ = 277,                  /* BEGIN_  */
+    CASE = 278,                    /* CASE  */
+    CHARACTER = 279,               /* CHARACTER  */
+    ELSE = 280,                    /* ELSE  */
+    END = 281,                     /* END  */
+    ENDSWITCH = 282,               /* ENDSWITCH  */
+    FUNCTION = 283,                /* FUNCTION  */
+    INTEGER = 284,                 /* INTEGER  */
+    IS = 285,                      /* IS  */
+    LIST = 286,                    /* LIST  */
+    OF = 287,                      /* OF  */
+    OTHERS = 288,                  /* OTHERS  */
+    RETURNS = 289,                 /* RETURNS  */
+    SWITCH = 290,                  /* SWITCH  */
+    WHEN = 291,                    /* WHEN  */
+    IF = 292,                      /* IF  */
+    ELSIF = 293,                   /* ELSIF  */
+    ENDIF = 294,                   /* ENDIF  */
+    THEN = 295                     /* THEN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -87,7 +100,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "parser.y"
+#line 32 "parser.y"
 
 	CharPtr iden;
 	Types type;
@@ -97,7 +110,7 @@ union YYSTYPE
 	vector<double>* list;
 	vector<Types>* typesList;
 
-#line 101 "parser.tab.h"
+#line 114 "parser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

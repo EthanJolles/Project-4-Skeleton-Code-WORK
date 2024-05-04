@@ -23,6 +23,8 @@ void yyerror(const char* message);
 Symbols<Types> scalars;
 Symbols<Types> lists;
 
+extern Types currentListType;
+
 %}
 
 %define parse.error verbose
@@ -39,17 +41,31 @@ Symbols<Types> lists;
 
 %token <iden> IDENTIFIER
 
-%token <value> INT_LITERAL CHAR_LITERAL REAL_LITERAL HEX_INT_LITERAL 
+%token <type> INT_LITERAL CHAR_LITERAL REAL_LITERAL HEX_INT_LITERAL
 
-%token ADDOP MULOP RELOP ANDOP ARROW
+%token <oper> OROP      /* | */
+%token <oper> ANDOP     /* & */
+%token <oper> RELOP   /* <, >, <>, == */
+%token <oper> ADDOP     /* + */
+%token <oper> MULOP     /* * */
+%token <oper> MODOP     /* % */
+%token <oper> XOROP     /* ^ */
+%token <oper> NEGOP  /* ~ */
+%token <oper> NOTOP     /* ! */
+%token <oper> ARROW   /* => */
+
+%token FOLD ENDFOLD LEFT RIGHT
 
 %token BEGIN_ CASE CHARACTER ELSE END ENDSWITCH FUNCTION INTEGER IS LIST OF OTHERS
 	RETURNS SWITCH WHEN
 
-%type <type> body type statement_ statement cases case expression
-	term primary
+%token IF ELSIF ENDIF THEN
 
-%type <typesList> list expressions
+
+%type <type> list expressions body type statement_ statement cases case expression
+	term primary relation condition optional_elsif_else statements
+
+%type <value> optional_variable fold_direction
 
 %%
 
@@ -67,36 +83,23 @@ function_header:
 type:
 	INTEGER {$$ = INT_TYPE;} |
 	CHARACTER {$$ = CHAR_TYPE; } |
+	REAL_LITERAL {$$ = REAL_TYPE;} |
 	IDENTIFIER;
 	
 optional_variable:
 	variable |
-	%empty ;
+	%empty;
     
 variable:	
 	IDENTIFIER ':' type IS statement ';' {checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3);} |
-    IDENTIFIER ':' LIST OF type IS list ';' {
-        lists.insert($1, $5);
-        currentListType = $5;
-    } 
+    IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5); currentListType = $5;} ; 
 
 list:
-    '(' expressions ')' {
-        $$ = $2;
-        if (!checkListTypes($$, currentListType)) {
-            yyerror("List initialization type mismatch");
-        }
-    } ;
+    '(' expressions ')' {$$ = $2;} ;
 
 expressions:
-    expressions ',' expression {
-        $$ = $1;
-        $$->push_back(getTypeOfExpression($3));
-    }
-    | expression {
-        $$ = new vector<Types>;
-        $$->push_back(getTypeOfExpression($1));
-    };
+    expressions ',' expression {$$ = getTypeOfExpression($1);}; | 
+	expression {$$ = getTypeOfExpression($1);};
 
 body:
 	BEGIN_ statement_ END ';' {$$ = $2;} ;
@@ -106,11 +109,33 @@ statement_:
 	error ';' {$$ = MISMATCH;} ;
 	
 statement:
-	expression |
+	expression {} |
 	WHEN condition ',' expression ':' expression 
 		{$$ = checkWhen($4, $6);} |
+	IF condition THEN statements optional_elsif_else ENDIF {$$ = $5;} |
+	    FOLD fold_direction ADDOP expression ENDFOLD |
 	SWITCH expression IS cases OTHERS ARROW statement ';' ENDSWITCH 
 		{$$ = checkSwitch($2, $4, $7);} ;
+
+fold_direction:
+    LEFT { $$ = 1; } | 
+    RIGHT { $$ = -1; }; 
+
+/* arithmetic_operator:
+    ADDOP |
+    MULOP |
+    MODOP |
+	XOROP; */
+
+
+optional_elsif_else:
+    ELSIF condition THEN statements optional_elsif_else { $$ = $2 ? $4 : $5; } |
+    ELSE statements { $$ = $2; } |
+    %empty;
+		
+statements:
+    statement ';' statements { $$ = $1; } | 
+    statement ';' { $$ = $1; };
 
 cases:
 	cases case {$$ = checkCases($1, $2);} |
@@ -121,14 +146,20 @@ case:
 
 condition:
 	condition ANDOP relation |
+	condition OROP relation |
+	primary |
 	relation ;
 
 relation:
-	'(' condition')' |
-	expression RELOP expression ;
+	'(' condition ')' {$$ = $2;} |
+	expression RELOP expression {$$ = checkComparison($1, $3);} |
+	expression ANDOP expression {$$ = checkComparison($1, $3);} |
+	expression OROP expression {$$ = checkComparison($1, $3);}; 
 	
 expression:
-	expression ADDOP term {$$ = checkArithmetic($1, $3);} |
+	expression XOROP term {$$ = checkArithmetic($1, $3); checkArithmeticType($1, $3);} |
+	expression ADDOP term {$$ = checkArithmetic($1, $3); checkArithmeticType($1, $3);} |
+	expression MODOP term {$$ = checkArithmetic($1, $3); checkModIsInteger($1, $3);} |
 	term ;
       
 term:
@@ -137,12 +168,14 @@ term:
 
 primary:
 	'(' expression ')' {$$ = $2;} |
-	HEX_INT_LITERAL
+	HEX_INT_LITERAL |
 	INT_LITERAL | 
 	REAL_LITERAL |
 	CHAR_LITERAL |
+	NEGOP primary {$$ = checkNegation($2);} |
 	IDENTIFIER '(' expression ')' {$$ = find(lists, $1, "List");} |
 	IDENTIFIER  {$$ = find(scalars, $1, "Scalar");} ;
+
 
 %%
 

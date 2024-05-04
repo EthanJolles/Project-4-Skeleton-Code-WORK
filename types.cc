@@ -59,6 +59,64 @@ Types checkArithmetic(Types left, Types right) {
 	return MISMATCH;
 }
 
+// I dont know why the types are not being paseed properly to this, it has a 100% fail rate whenever 
+// an arithmetic operator is encountered. I have tried multiple different ways
+Types checkArithmeticType(Types left, Types right) {
+    if (left == MISMATCH || right == MISMATCH) {
+        return MISMATCH;
+    }
+    if ((left != INT_TYPE && left != REAL_TYPE) || (right != INT_TYPE && right != REAL_TYPE)) {
+        return left;
+    }
+    appendError(GENERAL_SEMANTIC, "Arithmetic Operator Requires Numeric Types");
+    return MISMATCH;
+
+}
+
+Types checkModIsInteger(Types left, Types right) {
+    if (left != INT_TYPE || right != INT_TYPE) {
+        appendError(GENERAL_SEMANTIC, "Remainder Operator Requires Integer Operands");
+    }
+    return INT_TYPE;
+    
+}
+
+Types checkNegation(Types right) {
+    if (right == MISMATCH || right != INT_TYPE || right != REAL_TYPE) {
+        appendError(GENERAL_SEMANTIC,  "Arithmetic Operator Requires Numeric Types");
+    };
+    return right;
+}
+
+Types checkComparison(Types left, Types right) {
+    if (left != right) {
+        appendError(GENERAL_SEMANTIC, "Character Literals Cannot be Compared to Numeric Expressions");
+    }
+    if (left == MISMATCH || right == MISMATCH)
+        return MISMATCH;
+    return left;
+}
+
+bool isTypeValid(const vector<Types>* typesList, Types expectedType) {
+    for (const auto& type : *typesList) {
+        if (type != expectedType) {
+            return false;
+        }
+    }
+    return true;
+}
+
+double evaluateNegation(Types right) {
+    return ~right;
+}
+
+Types getTypeOfExpression(double value) {
+    if (floor(value) == value) {
+        return INT_TYPE;
+    }
+    return REAL_TYPE;
+}
+
 
 char evaluateCharLiteral(const std::string& literal) {
     std::string value = literal.substr(1, literal.size() - 2);
@@ -80,20 +138,4 @@ int hexToInt(const std::string& hexString) {
     int decimal;
     ss >> decimal;
     return decimal;
-}
-
-bool checkListTypes(const vector<Types>* typesList, Types expectedType) {
-    for (const auto& type : *typesList) {
-        if (type != expectedType) {
-            return false;
-        }
-    }
-    return true;
-}
-
-Types getTypeOfExpression(double value) {
-    if (floor(value) == value) {
-        return INT_TYPE;
-    }
-    return REAL_TYPE;
 }
