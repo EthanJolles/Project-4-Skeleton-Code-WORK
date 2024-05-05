@@ -68,11 +68,11 @@ left {ECHO; return LEFT; }
 right {ECHO; return RIGHT; }
 begin		{ ECHO; return(BEGIN_); }
 case		{ ECHO; return(CASE); }
+then { ECHO; return(THEN);}
 character	{ ECHO; return(CHARACTER); }
 end		{ ECHO; return(END); }
 endswitch	{ ECHO; return(ENDSWITCH); }
 function	{ ECHO; return(FUNCTION); }
-integer		{ ECHO; return(INTEGER); }
 is		{ ECHO; return(IS); }
 list		{ ECHO; return(LIST); }
 of		{ ECHO; return(OF); }
@@ -80,6 +80,13 @@ others		{ ECHO; return(OTHERS); }
 returns		{ ECHO; return(RETURNS); }
 switch		{ ECHO; return(SWITCH); }
 when		{ ECHO; return(WHEN); }
+
+integer {ECHO; return(INTEGER); }
+real {ECHO; return(REAL_LITERAL); }
+character {ECHO; return(CHAR_LITERAL); }
+
+
+
 
 {id}		{ ECHO; yylval.iden = (CharPtr)malloc(yyleng + 1); strcpy(yylval.iden, yytext); return(IDENTIFIER);}
 {dec}		{ ECHO; yylval.value = atoi(yytext); return(INT_LITERAL); }

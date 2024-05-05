@@ -23,6 +23,10 @@ using namespace std;
 Types currentListType;
 
 void checkAssignment(Types lValue, Types rValue, string message) {
+    if (lValue == INT_TYPE && (rValue == MISMATCH || rValue == REAL_TYPE)) {
+        appendError(GENERAL_SEMANTIC, "Narrowing " + message);
+        return;
+    }
 	if (lValue != MISMATCH && rValue != MISMATCH && lValue != rValue)
 		appendError(GENERAL_SEMANTIC, "Type Mismatch on " + message);
 }
@@ -41,6 +45,14 @@ Types checkSwitch(Types case_, Types when, Types other) {
 	return checkCases(when, other);
 }
 
+Types checkIfMatch(Types statement, Types expectedType) {
+    if (statement != expectedType) {
+        appendError(GENERAL_SEMANTIC, "If-Elsif-Else Type Mismatch");
+        return MISMATCH;
+    }
+    return expectedType;
+}
+
 Types checkCases(Types left, Types right) {
 	if (left == MISMATCH || right == MISMATCH)
 		return MISMATCH;
@@ -51,26 +63,18 @@ Types checkCases(Types left, Types right) {
 }
 
 Types checkArithmetic(Types left, Types right) {
-	if (left == MISMATCH || right == MISMATCH)
-		return MISMATCH;
-	if (left == INT_TYPE && right == INT_TYPE)
-		return INT_TYPE;
-	appendError(GENERAL_SEMANTIC, "Integer Type Required");
-	return MISMATCH;
-}
-
-// I dont know why the types are not being paseed properly to this, it has a 100% fail rate whenever 
-// an arithmetic operator is encountered. I have tried multiple different ways
-Types checkArithmeticType(Types left, Types right) {
-    if (left == MISMATCH || right == MISMATCH) {
-        return MISMATCH;
+    if (left == INT_TYPE && right == INT_TYPE) {
+        return INT_TYPE;
+    }
+    if ((left == INT_TYPE && right == REAL_TYPE) || (left == REAL_TYPE && right == INT_TYPE)) {
+        return REAL_TYPE;
     }
     if ((left != INT_TYPE && left != REAL_TYPE) || (right != INT_TYPE && right != REAL_TYPE)) {
+        appendError(GENERAL_SEMANTIC, "Arithmetic Operator Requires Numeric Types");
         return left;
     }
-    appendError(GENERAL_SEMANTIC, "Arithmetic Operator Requires Numeric Types");
-    return MISMATCH;
-
+            printf("Womp2");
+	return MISMATCH;
 }
 
 Types checkModIsInteger(Types left, Types right) {
@@ -97,24 +101,25 @@ Types checkComparison(Types left, Types right) {
     return left;
 }
 
-bool isTypeValid(const vector<Types>* typesList, Types expectedType) {
-    for (const auto& type : *typesList) {
-        if (type != expectedType) {
+bool checkFoldNumericList(const vector<Types>* typesList) {
+    // Check if the pointer is null before dereferencing
+    if (typesList == nullptr) {
+        appendError(GENERAL_SEMANTIC, "Null pointer passed to checkFoldNumericList");
+        return false;
+    }
+
+    // Iterate through the list and check each type
+    for (Types type : *typesList) {
+        if (type != INT_TYPE && type != REAL_TYPE) {
+            appendError(GENERAL_SEMANTIC, "Fold Requires A Numeric List");
             return false;
-        }
+        };
     }
     return true;
 }
 
 double evaluateNegation(Types right) {
     return ~right;
-}
-
-Types getTypeOfExpression(double value) {
-    if (floor(value) == value) {
-        return INT_TYPE;
-    }
-    return REAL_TYPE;
 }
 
 
@@ -132,10 +137,35 @@ char evaluateCharLiteral(const std::string& literal) {
     return value[0];
 }
 
-int hexToInt(const std::string& hexString) {
-    std::stringstream ss;
-    ss << std::hex << hexString;
-    int decimal;
-    ss >> decimal;
-    return decimal;
+int hexToInt(const char* hexStr) {
+    int num;
+    sscanf(hexStr + 1, "%x", &num); // Skip the '#' character
+    return num;
+}
+
+// Utility function for debugging
+void printTypeName(Types type) {
+    printf("\nReceived Type: ");
+    switch (type) {
+        case MISMATCH:
+            printf("MISMATCH\n");
+            break;
+        case INT_TYPE:
+            printf("INT_TYPE\n");
+            break;
+        case CHAR_TYPE:
+            printf("CHAR_TYPE\n");
+            break;
+        case REAL_TYPE:
+            printf("REAL_TYPE\n");
+            break;
+        case BOOL_TYPE:
+            printf("BOOL_TYPE\n");
+            break;
+        case NONE:
+            printf("NONE\n");
+            break;
+        default:
+            printf("UNKNOWN_TYPE\n");
+    }
 }
