@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 8 "parser.y"
+#line 9 "parser.y"
 
 #include <string>
 #include <vector>
@@ -86,10 +86,11 @@ void yyerror(const char* message);
 Symbols<Types> scalars;
 Symbols<Types> lists;
 
+Types currentListType;
 Types currentFunctionType;
 
 
-#line 93 "parser.tab.c"
+#line 94 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1504,269 +1505,281 @@ yyreduce:
   case 5: /* function_header: FUNCTION IDENTIFIER RETURNS type ';'  */
 #line 81 "parser.y"
                                              {currentFunctionType = (yyvsp[-1].type);}
-#line 1508 "parser.tab.c"
+#line 1509 "parser.tab.c"
     break;
 
   case 6: /* type: INTEGER  */
 #line 84 "parser.y"
                 {(yyval.type) = INT_TYPE;}
-#line 1514 "parser.tab.c"
+#line 1515 "parser.tab.c"
     break;
 
   case 7: /* type: CHARACTER  */
 #line 85 "parser.y"
                   {(yyval.type) = CHAR_TYPE; }
-#line 1520 "parser.tab.c"
+#line 1521 "parser.tab.c"
     break;
 
   case 8: /* type: REAL_LITERAL  */
 #line 86 "parser.y"
                      {(yyval.type) = REAL_TYPE;}
-#line 1526 "parser.tab.c"
+#line 1527 "parser.tab.c"
     break;
 
   case 9: /* type: HEX_INT_LITERAL  */
 #line 87 "parser.y"
                         {(yyval.type) = INT_TYPE;}
-#line 1532 "parser.tab.c"
+#line 1533 "parser.tab.c"
     break;
 
   case 12: /* optional_variable: %empty  */
 #line 92 "parser.y"
                {(yyval.value) = 0;}
-#line 1538 "parser.tab.c"
+#line 1539 "parser.tab.c"
     break;
 
   case 13: /* variable: IDENTIFIER ':' type IS statement ';'  */
 #line 95 "parser.y"
                                              {(yyval.type) = (yyvsp[-3].type); checkAssignment((yyvsp[-3].type), (yyvsp[-1].type), "Variable Initialization"); scalars.insert((yyvsp[-5].iden), (yyvsp[-3].type));}
-#line 1544 "parser.tab.c"
+#line 1545 "parser.tab.c"
     break;
 
   case 14: /* variable: IDENTIFIER ':' LIST OF type IS list ';'  */
 #line 96 "parser.y"
-                                            {lists.insert((yyvsp[-7].iden), (yyvsp[-3].type));}
-#line 1550 "parser.tab.c"
+                                            {lists.insert((yyvsp[-7].iden), (yyvsp[-3].type)); checkListMatch((yyvsp[-1].type), (yyvsp[-3].type));}
+#line 1551 "parser.tab.c"
     break;
 
   case 15: /* list: '(' expressions ')'  */
 #line 99 "parser.y"
-                        {(yyval.typesList) = (yyvsp[-1].typesList);}
-#line 1556 "parser.tab.c"
+                        {(yyval.type) = (yyvsp[-1].type);}
+#line 1557 "parser.tab.c"
+    break;
+
+  case 16: /* expressions: expression  */
+#line 102 "parser.y"
+               {(yyval.type) = (yyvsp[0].type);}
+#line 1563 "parser.tab.c"
+    break;
+
+  case 17: /* expressions: expressions ',' expression  */
+#line 103 "parser.y"
+                                   {(yyval.type) = (yyvsp[0].type);}
+#line 1569 "parser.tab.c"
     break;
 
   case 18: /* body: BEGIN_ statement_ END ';'  */
 #line 106 "parser.y"
                                   {(yyval.type) = (yyvsp[-2].type);}
-#line 1562 "parser.tab.c"
+#line 1575 "parser.tab.c"
     break;
 
   case 20: /* statement_: error ';'  */
 #line 110 "parser.y"
                   {(yyval.type) = MISMATCH;}
-#line 1568 "parser.tab.c"
+#line 1581 "parser.tab.c"
     break;
 
   case 21: /* statement: expression  */
 #line 113 "parser.y"
                    {(yyval.type) = (yyvsp[0].type);}
-#line 1574 "parser.tab.c"
+#line 1587 "parser.tab.c"
     break;
 
   case 22: /* statement: WHEN condition ',' expression ':' expression  */
 #line 115 "parser.y"
                 {(yyval.type) = checkWhen((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1580 "parser.tab.c"
+#line 1593 "parser.tab.c"
     break;
 
   case 23: /* statement: IF condition THEN statements optional_elsif_else ENDIF  */
 #line 116 "parser.y"
                                                                {(yyval.type) = checkIfMatch((yyvsp[-2].type), currentFunctionType);}
-#line 1586 "parser.tab.c"
+#line 1599 "parser.tab.c"
     break;
 
   case 24: /* statement: FOLD fold_direction ADDOP list ENDFOLD  */
 #line 117 "parser.y"
-                                               {checkFoldNumericList((yyvsp[-1].typesList));}
-#line 1592 "parser.tab.c"
+                                               {(yyval.type) = checkFoldMatch((yyvsp[-1].type));}
+#line 1605 "parser.tab.c"
     break;
 
   case 25: /* statement: SWITCH expression IS cases OTHERS ARROW statement ';' ENDSWITCH  */
 #line 119 "parser.y"
                 {(yyval.type) = checkSwitch((yyvsp[-7].type), (yyvsp[-5].type), (yyvsp[-2].type));}
-#line 1598 "parser.tab.c"
+#line 1611 "parser.tab.c"
     break;
 
   case 26: /* fold_direction: LEFT  */
 #line 122 "parser.y"
          { (yyval.value) = 1; }
-#line 1604 "parser.tab.c"
+#line 1617 "parser.tab.c"
     break;
 
   case 27: /* fold_direction: RIGHT  */
 #line 123 "parser.y"
           { (yyval.value) = -1; }
-#line 1610 "parser.tab.c"
+#line 1623 "parser.tab.c"
     break;
 
   case 28: /* optional_elsif_else: ELSIF condition THEN statements optional_elsif_else  */
 #line 127 "parser.y"
                                                         {checkIfMatch((yyvsp[-1].type), currentFunctionType);}
-#line 1616 "parser.tab.c"
+#line 1629 "parser.tab.c"
     break;
 
   case 29: /* optional_elsif_else: ELSE statements  */
 #line 128 "parser.y"
                     {checkIfMatch((yyvsp[0].type), currentFunctionType);}
-#line 1622 "parser.tab.c"
+#line 1635 "parser.tab.c"
     break;
 
   case 30: /* optional_elsif_else: %empty  */
 #line 129 "parser.y"
            {(yyval.type) = NONE;}
-#line 1628 "parser.tab.c"
+#line 1641 "parser.tab.c"
     break;
 
   case 31: /* statements: statement ';' statements  */
 #line 132 "parser.y"
                              { (yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1634 "parser.tab.c"
+#line 1647 "parser.tab.c"
     break;
 
   case 32: /* statements: statement ';'  */
 #line 133 "parser.y"
                   { (yyval.type) = (yyvsp[-1].type); }
-#line 1640 "parser.tab.c"
+#line 1653 "parser.tab.c"
     break;
 
   case 33: /* cases: cases case  */
 #line 136 "parser.y"
                    {(yyval.type) = checkCases((yyvsp[-1].type), (yyvsp[0].type));}
-#line 1646 "parser.tab.c"
+#line 1659 "parser.tab.c"
     break;
 
   case 34: /* cases: %empty  */
 #line 137 "parser.y"
                {(yyval.type) = NONE;}
-#line 1652 "parser.tab.c"
+#line 1665 "parser.tab.c"
     break;
 
   case 35: /* case: CASE INT_LITERAL ARROW statement ';'  */
 #line 140 "parser.y"
                                              {(yyval.type) = (yyvsp[-1].type);}
-#line 1658 "parser.tab.c"
+#line 1671 "parser.tab.c"
     break;
 
   case 36: /* condition: condition ANDOP relation  */
 #line 143 "parser.y"
                                  {(yyval.value) = (yyvsp[-2].value) && (yyvsp[-1].oper);}
-#line 1664 "parser.tab.c"
+#line 1677 "parser.tab.c"
     break;
 
   case 37: /* condition: condition OROP relation  */
 #line 144 "parser.y"
                                 {(yyval.value) = (yyvsp[-2].value) || (yyvsp[-1].oper);}
-#line 1670 "parser.tab.c"
+#line 1683 "parser.tab.c"
     break;
 
   case 40: /* relation: '(' condition ')'  */
 #line 149 "parser.y"
                           {(yyval.value) = (yyvsp[-1].value);}
-#line 1676 "parser.tab.c"
+#line 1689 "parser.tab.c"
     break;
 
   case 41: /* relation: expression RELOP expression  */
 #line 150 "parser.y"
                                     {(yyval.value) = checkComparison((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1682 "parser.tab.c"
+#line 1695 "parser.tab.c"
     break;
 
   case 42: /* relation: expression ANDOP expression  */
 #line 151 "parser.y"
                                     {(yyval.value) = checkComparison((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1688 "parser.tab.c"
+#line 1701 "parser.tab.c"
     break;
 
   case 43: /* relation: expression OROP expression  */
 #line 152 "parser.y"
                                    {(yyval.value) = checkComparison((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1694 "parser.tab.c"
+#line 1707 "parser.tab.c"
     break;
 
   case 44: /* expression: expression XOROP term  */
 #line 155 "parser.y"
                               {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1700 "parser.tab.c"
+#line 1713 "parser.tab.c"
     break;
 
   case 45: /* expression: expression ADDOP term  */
 #line 156 "parser.y"
                               {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1706 "parser.tab.c"
+#line 1719 "parser.tab.c"
     break;
 
   case 46: /* expression: expression MODOP term  */
 #line 157 "parser.y"
                               {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type)); checkModIsInteger((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1712 "parser.tab.c"
+#line 1725 "parser.tab.c"
     break;
 
   case 48: /* term: term MULOP primary  */
 #line 161 "parser.y"
                            {(yyval.type) = checkArithmetic((yyvsp[-2].type), (yyvsp[0].type));}
-#line 1718 "parser.tab.c"
+#line 1731 "parser.tab.c"
     break;
 
   case 50: /* primary: '(' expression ')'  */
 #line 165 "parser.y"
                            {(yyval.type) = (yyvsp[-1].type);}
-#line 1724 "parser.tab.c"
+#line 1737 "parser.tab.c"
     break;
 
   case 51: /* primary: HEX_INT_LITERAL  */
 #line 166 "parser.y"
                         {(yyval.type) = INT_TYPE;}
-#line 1730 "parser.tab.c"
+#line 1743 "parser.tab.c"
     break;
 
   case 52: /* primary: INT_LITERAL  */
 #line 167 "parser.y"
                     {(yyval.type) = INT_TYPE;}
-#line 1736 "parser.tab.c"
+#line 1749 "parser.tab.c"
     break;
 
   case 53: /* primary: REAL_LITERAL  */
 #line 168 "parser.y"
                      {(yyval.type) = REAL_TYPE;}
-#line 1742 "parser.tab.c"
+#line 1755 "parser.tab.c"
     break;
 
   case 54: /* primary: CHAR_LITERAL  */
 #line 169 "parser.y"
                      {(yyval.type) = CHAR_TYPE;}
-#line 1748 "parser.tab.c"
+#line 1761 "parser.tab.c"
     break;
 
   case 55: /* primary: NEGOP primary  */
 #line 170 "parser.y"
                       {(yyval.type) = checkNegation((yyvsp[0].type));}
-#line 1754 "parser.tab.c"
+#line 1767 "parser.tab.c"
     break;
 
   case 56: /* primary: IDENTIFIER '(' expression ')'  */
 #line 171 "parser.y"
-                                      {(yyval.type) = find(lists, (yyvsp[-3].iden), "List");}
-#line 1760 "parser.tab.c"
+                                      {(yyval.type) = find(lists, (yyvsp[-3].iden), "List"); checkIsInt((yyvsp[-1].type));}
+#line 1773 "parser.tab.c"
     break;
 
   case 57: /* primary: IDENTIFIER  */
 #line 172 "parser.y"
                     {(yyval.type) = find(scalars, (yyvsp[0].iden), "Scalar");}
-#line 1766 "parser.tab.c"
+#line 1779 "parser.tab.c"
     break;
 
 
-#line 1770 "parser.tab.c"
+#line 1783 "parser.tab.c"
 
       default: break;
     }

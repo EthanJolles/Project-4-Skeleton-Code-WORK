@@ -161,10 +161,10 @@ Nonterminals, with rules where they appear
     variable <type> (52)
         on left: 12 13
         on right: 2 10
-    list <typesList> (53)
+    list <type> (53)
         on left: 14
         on right: 13 23
-    expressions <typesList> (54)
+    expressions <type> (54)
         on left: 15 16
         on right: 14 16
     body <type> (55)

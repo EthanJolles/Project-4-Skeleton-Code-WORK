@@ -2,6 +2,7 @@
 // Project 4 Skeleton
 // UMGC CITE
 // Summer 2023
+// Ethan Jolles
 
 // This file contains type definitions and the function
 // prototypes for the type checking functions
@@ -14,8 +15,6 @@ void yyerror(const char* message);
 
 enum Operators {ADD, SUB, MULTIPLY, DIVIDE, LESS, EQUALS, LESSTHANEQUAL, AND, EXPONENT, NEGATE, MODULO, XOR, NOT, NOTEQUAL, GREATER, GREATERTHANEQUAL, ASSIGN, OR};
 enum Types {MISMATCH, INT_TYPE, CHAR_TYPE, REAL_TYPE, BOOL_TYPE, NONE};
-
-extern Types currentListType;
 
 double evaluateNegation(Types right);
 int hexToInt(const char* hexStr);
@@ -31,7 +30,9 @@ Types checkCases(Types left, Types right);
 Types checkArithmetic(Types left, Types right);
 Types checkArithmeticType(Types left, Types right);
 Types checkNegation(Types right);
-bool checkFoldNumericList(const vector<Types>* typesList);
+Types checkFoldMatch(Types type);
+void checkIsInt(Types type);
+Types checkListMatch(Types type, Types expectedType);
 Types checkModIsInteger(Types left, Types right);
 Types checkComparison(Types left, Types right);
 Types getTypeOfExpression(double value);

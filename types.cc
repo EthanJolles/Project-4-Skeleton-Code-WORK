@@ -2,6 +2,7 @@
 // Project 4 Skeleton
 // UMGC CITE
 // Summer 2023
+// Ethan Jolles
 
 // This file contains the bodies of the type checking functions
 
@@ -19,8 +20,6 @@ using namespace std;
 
 #include "types.h"
 #include "listing.h"
-
-Types currentListType;
 
 void checkAssignment(Types lValue, Types rValue, string message) {
     if (lValue == INT_TYPE && (rValue == MISMATCH || rValue == REAL_TYPE)) {
@@ -63,6 +62,10 @@ Types checkCases(Types left, Types right) {
 }
 
 Types checkArithmetic(Types left, Types right) {
+    if (left == INT_TYPE && (right == MISMATCH || right == REAL_TYPE)) {
+        appendError(GENERAL_SEMANTIC, "Illegal Narrowing Function Return");
+        return MISMATCH;
+    }
     if (left == INT_TYPE && right == INT_TYPE) {
         return INT_TYPE;
     }
@@ -101,21 +104,31 @@ Types checkComparison(Types left, Types right) {
     return left;
 }
 
-bool checkFoldNumericList(const vector<Types>* typesList) {
-    // Check if the pointer is null before dereferencing
-    if (typesList == nullptr) {
-        appendError(GENERAL_SEMANTIC, "Null pointer passed to checkFoldNumericList");
-        return false;
+Types checkListMatch(Types type, Types expectedType) {
+    if (type != expectedType)
+    {
+        appendError(GENERAL_SEMANTIC, "Semantic Error, List Type Does Not Match Element Types");
+        return MISMATCH;
     }
+    return type;
+    
+}
 
-    // Iterate through the list and check each type
-    for (Types type : *typesList) {
-        if (type != INT_TYPE && type != REAL_TYPE) {
-            appendError(GENERAL_SEMANTIC, "Fold Requires A Numeric List");
-            return false;
-        };
+// Make sure arg passed into list index-access is an int not a real/char
+void checkIsInt(Types type) {
+    if (type != INT_TYPE)
+    {
+        appendError(GENERAL_SEMANTIC, "List Subscript Must Be Integer");
     }
-    return true;
+    
+}
+
+Types checkFoldMatch(Types type) {
+    if (type != INT_TYPE)
+    {
+        appendError(GENERAL_SEMANTIC, "Fold Requires A Numeric List");
+    }
+    return MISMATCH;
 }
 
 double evaluateNegation(Types right) {

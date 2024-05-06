@@ -2,6 +2,7 @@
    Project 4 Skeleton
    UMGC CITE
    Summer 2023
+   Ethan Jolles
    
    Project 4 Parser with semantic actions for static semantic errors */
 
@@ -23,6 +24,7 @@ void yyerror(const char* message);
 Symbols<Types> scalars;
 Symbols<Types> lists;
 
+Types currentListType;
 Types currentFunctionType;
 
 %}
@@ -60,10 +62,8 @@ Types currentFunctionType;
 %token IF ELSIF ENDIF THEN
 
 
-%type <type> variable body type statement_ statement cases case expression
-	term primary optional_elsif_else statements
-
-%type <typesList> list expressions; 
+%type <type> body statement_ statement cases case expression
+	term primary optional_elsif_else statements list expressions type variable;
 
 %type <value> optional_variable fold_direction condition relation
 
@@ -93,14 +93,14 @@ optional_variable:
     
 variable:	
 	IDENTIFIER ':' type IS statement ';' {$$ = $3; checkAssignment($3, $5, "Variable Initialization"); scalars.insert($1, $3);} |
-    IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5);} ; 
+    IDENTIFIER ':' LIST OF type IS list ';' {lists.insert($1, $5); checkListMatch($7, $5);} ; 
 
 list:
-    '(' expressions ')' {$$ = $2;} ;
+    '(' expressions ')' {$$ = $2;};
 
 expressions:
-    expression |
-	expressions ',' expression;
+    expression {$$ = $1;} |
+	expressions ',' expression {$$ = $3;} ;
 
 body:
 	BEGIN_ statement_ END ';' {$$ = $2;} ;
@@ -114,7 +114,7 @@ statement:
 	WHEN condition ',' expression ':' expression 
 		{$$ = checkWhen($4, $6);} |
 	IF condition THEN statements optional_elsif_else ENDIF {$$ = checkIfMatch($4, currentFunctionType);} |
-	FOLD fold_direction ADDOP list ENDFOLD {checkFoldNumericList($4);} |
+	FOLD fold_direction ADDOP list ENDFOLD {$$ = checkFoldMatch($4);} |
 	SWITCH expression IS cases OTHERS ARROW statement ';' ENDSWITCH 
 		{$$ = checkSwitch($2, $4, $7);} ;
 
@@ -168,7 +168,7 @@ primary:
 	REAL_LITERAL {$$ = REAL_TYPE;}|
 	CHAR_LITERAL {$$ = CHAR_TYPE;} |
 	NEGOP primary {$$ = checkNegation($2);} |
-	IDENTIFIER '(' expression ')' {$$ = find(lists, $1, "List");} |
+	IDENTIFIER '(' expression ')' {$$ = find(lists, $1, "List"); checkIsInt($3);} |
 	IDENTIFIER  {$$ = find(scalars, $1, "Scalar");} ;
 
 

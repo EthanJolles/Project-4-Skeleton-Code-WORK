@@ -1,7 +1,8 @@
 /* CMSC 430 Compiler Theory and Design
    Project 4 Skeleton
    UMGC CITE
-   Summer 2023 */
+   Summer 2023 
+   Ethan Jolles */
 
 /* This file contains flex input file */
 
@@ -29,7 +30,7 @@ digit		[0-9]
 dec		{digit}+
 char		'.'
 char_literal    "'"([^'\\]|\\.)*"'"
-punc		[,/\\(\)':;.#]
+punc		[,/\\(\)_':;.#]
 hex #[0-9A-Fa-f]+ 
 real [0-9]+(\.[0-9]+)?(E[+-]?[0-9]+)?
 %%
@@ -83,7 +84,6 @@ when		{ ECHO; return(WHEN); }
 
 integer {ECHO; return(INTEGER); }
 real {ECHO; return(REAL_LITERAL); }
-character {ECHO; return(CHAR_LITERAL); }
 
 
 
